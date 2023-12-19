@@ -34,7 +34,7 @@ steps = {
 def out_of_bounds(arr, idx) -> bool:
     return any(i < 0 for i in idx) or idx[0] >= arr.shape[0] or idx[1] >= arr.shape[1]
 
-# @profile
+@profile
 def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
     idx = Index((0, 0))
     chains: deque[StepChain] = deque()
@@ -62,10 +62,14 @@ def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
 
         for next_step in next_steps:
             new_tot = chain.total
-            next_idx = Index((chain.idx[0], chain.idx[1]))
-            next_idx = chain.idx + steps[next_step]
             
             for n_steps in range(1, max_steps + 1):
+                next_idx = Index(
+                    (
+                        chain.idx[0] + steps[next_step][0] * n_steps,
+                        chain.idx[1] + steps[next_step][1] * n_steps,
+                     )
+                )
                 try:
                     new_tot += arr[next_idx[0], next_idx[1]]
                 except IndexError:
