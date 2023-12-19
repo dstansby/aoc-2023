@@ -11,10 +11,10 @@ def read_file(fname: str) -> list[str]:
     return lines
 
 
-def read_arr(fname: str) -> npt.NDArray[np.str_]:
+def read_arr(fname: str, dtype=str) -> npt.NDArray:
     lines = read_file(fname)
 
-    arr = np.empty((len(lines), len(lines[0])), dtype=str)
+    arr = np.empty((len(lines), len(lines[0])), dtype=dtype)
 
     for i, line in enumerate(lines):
         for j, char in enumerate(line):
