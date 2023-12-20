@@ -29,7 +29,7 @@ steps = {
     "D": Index((1, 0))
 }
 
-# @profile
+@profile
 def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
     idx = Index((0, 0))
     chains: deque[StepChain] = deque()
@@ -56,11 +56,12 @@ def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
         # Loop through L/R or U/D
         for next_step in next_steps_dict[chain.previous_steps[-1]]:
             new_tot = chain.total
-            next_idx = copy(chain.idx)
+            next_idx = chain.idx
             
             for n_steps in range(1, max_steps + 1):
                 # Take one more step
                 next_idx += steps[next_step]
+                
             
                 if next_idx[0] < 0 or next_idx[1] < 0:
                     # Further steps will be out of bounds
@@ -72,11 +73,14 @@ def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
                 except IndexError:
                     # Further steps will be out of bounds
                     break
-                
 
                 if n_steps < min_steps:
                     # Go to next number of steps,
                     # having accumulated the total on this step
+                    continue
+
+                # If we've taken this step before, and the cost was lower than our current cost
+                if seen.get(((next_idx, next_step)), 1_000_000) <= new_tot:
                     continue
                 
                 if next_idx == final_idx:
@@ -86,13 +90,9 @@ def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
                         best_chains.append(best_chain)
                     # Rest will be out of bounds so just break
                     break
-                
-                # If we've taken this step before, and the cost was lower than our current cost
-                if seen.get((chain.idx, next_idx), 1_000_000) <= new_tot:
-                    continue
 
                 chains.append(StepChain(next_idx, chain.previous_steps + next_step * n_steps, new_tot))
-                seen[(chain.idx, next_idx)] = new_tot
+                seen[(next_idx, next_step)] = new_tot
 
         counter += 1
         if counter % 2**12 == 0:
@@ -102,6 +102,6 @@ def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
 
 
 if __name__ == "__main__":
-    arr = read_arr("17_example.txt", dtype=int)
-    print(min_length(arr, 1, 3))
+    arr = read_arr("17_input.txt", dtype=int)
+    # print(min_length(arr, 1, 3))
     print(min_length(arr, 4, 10))
