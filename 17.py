@@ -39,7 +39,7 @@ def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
     best_chain = StepChain(idx, "", 1_000_000)
     best_chains = []
 
-    seen = dict()
+    seen: dict[tuple[Index, str], int] = dict()
 
     final_idx = Index(np.array(arr.shape) - 1)
     next_steps_dict = {
