@@ -59,7 +59,7 @@ class Conjunction(Module):
 
 if __name__ == "__main__":
     # I/O
-    lines = read_file("20_example_2.txt")
+    lines = read_file("20_input.txt")
     modules: dict[str, Module] = {}
     for l in lines:
         name, dest = l.split(" -> ")
@@ -83,20 +83,33 @@ if __name__ == "__main__":
     # Populate conjunction dicts
     for module in modules.values():
         for dest in module.dests:
-            if isinstance((dest_mod :=modules[dest]), Conjunction):
+            if dest in modules and isinstance((dest_mod := modules[dest]), Conjunction):
                 dest_mod.prev_pulses[module.name] = "low"
 
 
-    pulse_queue: deque[Pulse] = deque()
-    # Press the button!
-    pulse_queue.append(Pulse("low", "button", "broadcaster"))
+    def push_button(n_presses: int) -> dict[PulseVal, int]:
+        # Returns number of high and number of low pulses
+        n_signals: dict[PulseVal, int] = {"low": 0, "high": 0}
 
-    while len(pulse_queue):
-        pulse = pulse_queue.popleft()
-        print(pulse)
-        new_pulses = modules[pulse.dest].process(pulse)
-        for p in new_pulses:
-            pulse_queue.append(p)
+        for _ in range(n_presses):
+            pulse_queue: deque[Pulse] = deque()
+            # Press the button!
+            pulse_queue.append(Pulse("low", "button", "broadcaster"))
+
+            while len(pulse_queue):
+                pulse = pulse_queue.popleft()
+                n_signals[pulse.val] += 1
+                if pulse.dest in modules:
+                    new_pulses = modules[pulse.dest].process(pulse)
+                    for p in new_pulses:
+                        pulse_queue.append(p)
+
+        return n_signals
+    
+    signals = push_button(1000)
+    print(signals)
+    print(signals["high"] * signals["low"])
 
 
-    print(modules)
+
+    
