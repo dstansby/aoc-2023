@@ -29,7 +29,7 @@ steps = {
     "D": Index((1, 0))
 }
 
-@profile
+# @profile
 def min_length(arr, min_steps: int, max_steps: int) -> StepChain:
     idx = Index((0, 0))
     chains: deque[StepChain] = deque()
